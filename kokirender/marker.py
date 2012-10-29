@@ -11,26 +11,28 @@ class Marker(object):
         self.code = code
         self.desc = ""
 
-    # def __repr__(self):
-    #     sys.stdout.write("# # # # # # # # # #\n")
-    #     sys.stdout.write("# # # # # # # # # #\n")
-    #     for i in range(6):
-    #         sys.stdout.write("# # ")
-    #         for j in range(6):
-    #             if grid[i][j] == 1:
-    #                 sys.stdout.write("# ")
-    #             else:
-    #                 sys.stdout.write("  ")
-    #         sys.stdout.write("# #\n")
-    #     sys.stdout.write("# # # # # # # # # #\n")
-    #     sys.stdout.write("# # # # # # # # # #\n")
+        self.grid = coder.user_code_grid( self.code )
 
+    def text_grid(self):
+        "Return a text representation of the marker's grid"
+
+        s = "# # # # # # # # # #\n" * 2
+
+        for i in range(6):
+            s += "# # "
+            for j in range(6):
+                if self.grid[i][j] == 1:
+                    s += "# "
+                else:
+                    s += "  "
+            s += "# #\n"
+
+        s += "# # # # # # # # # #\n" * 2
+        return s
 
     def render( self, surface,
                 overall_width, offset_x, offset_y,
                 desc="", show_text=1 ):
-
-        grid = coder.user_code_grid( self.code )
 
         marker_width = overall_width * (10.0/12.0)
         cell_width = marker_width / 10
@@ -65,7 +67,7 @@ class Marker(object):
         for row in range(6):
             for col in range(6):
 
-                if grid[row][col] == 1:
+                if self.grid[row][col] == 1:
                     #draw the 1 bit
                     cr.rectangle(offset_x + cell_width + cell_width * 2 + col * cell_width,
                                  offset_y + cell_width + cell_width * 2 + row * cell_width,
