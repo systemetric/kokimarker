@@ -32,7 +32,8 @@ class Marker(object):
 
     def render( self, surface,
                 overall_width, offset_x, offset_y,
-                desc="", show_text=True ):
+                desc="", show_text=True,
+                corner_dot = True ):
 
         marker_width = overall_width * (10.0/12.0)
         cell_width = marker_width / 10
@@ -89,10 +90,11 @@ class Marker(object):
             cr.show_text('libkoki marker #%d (%s)   %s' % (self.code, self.VERSION, self.desc))
 
         # put dot in top left
-        cr.new_sub_path()
-        grey = 0.2
-        cr.set_source_rgb(grey, grey, grey)
-        cr.arc(offset_x + cell_width + cell_width,
-               offset_y + cell_width + cell_width,
-               cell_width/8, 0, 2 * math.pi)
-        cr.fill()
+        if corner_dot:
+            cr.new_sub_path()
+            grey = 0.2
+            cr.set_source_rgb(grey, grey, grey)
+            cr.arc(offset_x + cell_width + cell_width,
+                   offset_y + cell_width + cell_width,
+                   cell_width/8, 0, 2 * math.pi)
+            cr.fill()
