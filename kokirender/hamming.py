@@ -45,7 +45,7 @@ def correct(l, z):
 
     return l
 
-def hamming_decode(l):
+def decode(l):
     syndrome = syndrome(l)
     corrected = correct(l, syndrome)
 
