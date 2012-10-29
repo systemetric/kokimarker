@@ -42,7 +42,7 @@ class Marker(object):
         cr = cairo.Context(surface)
 
         # draw outline
-        cr.set_line_width(1)
+        cr.set_line_width( overall_width * 0.005 )
         grey = 0.7
         cr.set_source_rgb(grey, grey, grey)
         cr.rectangle(offset_x, offset_y, overall_width, overall_width)
