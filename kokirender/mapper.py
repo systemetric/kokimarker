@@ -7,7 +7,8 @@ gaps.
 
 Definitions:
  * User-friendly code: The marker number that the user specifies.
- * Mapped code: A code that has been shifted around the gaps.
+ * Marker code: The number that is actually found in the grid of a
+                marker.
 """
 
 # The codes that are not used
@@ -16,8 +17,15 @@ bad_codes = [ 2, 3, 8, 9, 11, 13, 17, 19, 34, 42, 45, 46, 48, 51, 79,
               255 ]
 
 def gen_forwards_table():
-    """Return a dict that translates a user-friendly marker into a
-    mapped code."""
+    """Returns a dict mapping marker codes to user-friendly codes.
+
+    Returns a dict with keys 0-255.
+
+      keys: Marker code
+    values: User-friendly code -- unless the key is an invalid marker
+    code (a hole), in which case the value is -1.
+    """
+
     table = {}
     count = 0
     for i in range(256):
@@ -30,14 +38,29 @@ def gen_forwards_table():
 
 
 def gen_reverse_table(fwd_table):
-    """Return a dict that translate a mapped code into a
-    user-friendly code."""
-    rev = {}
-    items = fwd_table.items()
+    """Returns a dict mapping user friendly codes to marker codes.
 
-    for i in items:
-        if i[1] != -1:
-            rev[i[1]] = i[0]
+      keys: User-friendly codes.
+    values: Marker codes.
+    """
+
+    rev = {}
+
+    for marker_code, user_friendly in fwd_table.iteritems():
+        if user_friendly != -1:
+            rev[user_friendly] = marker_code
 
     return rev
 
+
+# FORWARD[marker code] = user-friendly code
+FORWARD = gen_forwards_table()
+
+# REVERSE[user-friendly code] = marker code
+REVERSE = gen_reverse_table( FORWARD )
+
+def marker_code_to_user_friendly(marker_code):
+    return FORWARD[marker_code]
+
+def user_friendly_to_marker_code(user_friendly):
+    return REVERSE[user_friendly]
