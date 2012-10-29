@@ -32,7 +32,7 @@ class Marker(object):
 
     def render( self, surface,
                 overall_width, offset_x, offset_y,
-                desc="", show_text=1 ):
+                desc="", show_text=True ):
 
         marker_width = overall_width * (10.0/12.0)
         cell_width = marker_width / 10
