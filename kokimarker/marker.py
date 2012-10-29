@@ -74,7 +74,7 @@ class Marker(object):
                                  offset_y + cell_width + cell_width * 2 + row * cell_width,
                                  marker_width * 0.1, marker_width * 0.1)
 
-                cr.fill()
+        cr.fill()
 
         # write on marker
         if show_text:
