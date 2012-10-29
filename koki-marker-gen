@@ -4,11 +4,8 @@ import getopt
 import kokimarker
 import sys
 
-def mm_to_in(x):
-    return x * 0.0393700787
-
 def mm_to_pt(x):
-    return 72 * mm_to_in(x)
+    return x * 2.8346278
 
 if len(sys.argv) < 3:
     print "Usage: ./markergen.py [--4up] [--desc val] <code> <output_prefix>"
