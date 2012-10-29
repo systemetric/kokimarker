@@ -36,6 +36,10 @@ for opt in optlist:
         DESC = opt[1]
 
 surface = cairo.PDFSurface(OUTFNAME, mm_to_pt(210), mm_to_pt(297) )
+cr = cairo.Context(surface)
+
+# Scale it up to mm-scale:
+cr.scale( mm_to_pt(1), mm_to_pt(1) )
 
 if not FOURUP:
 

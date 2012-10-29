@@ -30,7 +30,7 @@ class Marker(object):
         s += "# # # # # # # # # #\n" * 2
         return s
 
-    def render( self, surface,
+    def render( self, cr,
                 overall_width, offset_x, offset_y,
                 desc="", show_text=True,
                 corner_dot = True,
@@ -40,8 +40,6 @@ class Marker(object):
         cell_width = marker_width / 10
         cell_grid_offset_x = cell_width * 2
         cell_grid_offset_y = cell_width * 2
-
-        cr = cairo.Context(surface)
 
         # draw outline
         if outline:
