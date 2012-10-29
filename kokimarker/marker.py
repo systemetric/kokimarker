@@ -33,7 +33,8 @@ class Marker(object):
     def render( self, surface,
                 overall_width, offset_x, offset_y,
                 desc="", show_text=True,
-                corner_dot = True ):
+                corner_dot = True,
+                outline = True ):
 
         marker_width = overall_width * (10.0/12.0)
         cell_width = marker_width / 10
@@ -43,11 +44,12 @@ class Marker(object):
         cr = cairo.Context(surface)
 
         # draw outline
-        cr.set_line_width( overall_width * 0.005 )
-        grey = 0.7
-        cr.set_source_rgb(grey, grey, grey)
-        cr.rectangle(offset_x, offset_y, overall_width, overall_width)
-        cr.stroke()
+        if outline:
+            cr.set_line_width( overall_width * 0.005 )
+            grey = 0.7
+            cr.set_source_rgb(grey, grey, grey)
+            cr.rectangle(offset_x, offset_y, overall_width, overall_width)
+            cr.stroke()
 
         # draw black border
         cr.set_source_rgb(0, 0, 0)
