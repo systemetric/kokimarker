@@ -2,6 +2,7 @@ import cairo
 import code_table
 import CrcMoose
 import hamming
+import mapper
 import math
 
 def add_crc(marker_num):
@@ -89,8 +90,8 @@ class Marker(object):
                 overall_width, offset_x, offset_y,
                 desc="", show_text=1 ):
 
-        fwd = code_table.gen_forwards_table()
-        rev = code_table.gen_reverse_table(fwd)
+        fwd = mapper.gen_forwards_table()
+        rev = mapper.gen_reverse_table(fwd)
 
         grid = code_grid(add_crc(rev[ self.code ]))
 
