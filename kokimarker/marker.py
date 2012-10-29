@@ -56,20 +56,12 @@ class Marker(object):
                      marker_width, marker_width)
         cr.fill()
 
-        # draw white grid background (i.e. zero grid)
-        cr.set_source_rgb(1, 1, 1)
-        cr.rectangle(offset_x + cell_width + cell_width * 2,
-                     offset_y + cell_width + cell_width * 2,
-                     marker_width * 0.6, marker_width * 0.6)
-        cr.fill()
-
         #draw cells
-        cr.set_source_rgb(0, 0, 0)
+        cr.set_source_rgb(1, 1, 1)
         for row in range(6):
             for col in range(6):
-
-                if self.grid[row][col] == 1:
-                    #draw the 1 bit
+                if self.grid[row][col] == 0:
+                    # Set this cell to be white
                     cr.rectangle(offset_x + cell_width + cell_width * 2 + col * cell_width,
                                  offset_y + cell_width + cell_width * 2 + row * cell_width,
                                  marker_width * 0.1, marker_width * 0.1)
