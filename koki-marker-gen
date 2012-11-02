@@ -42,9 +42,9 @@ if not FOURUP:
 
     marker = kokimarker.Marker( CODE )
     
-    marker.render( cr, mm_to_pt(100),
-                  mm_to_pt((210 - 100) / 2),
-                  mm_to_pt((297 - 100) / 2), DESC)
+    marker.render( cr, 100,
+                   (210 - 100) / 2,
+                   (297 - 100) / 2, DESC )
 
 
 else:
@@ -52,8 +52,8 @@ else:
 
         marker = kokimarker.Marker( CODE )
 
-        marker.render( cr, mm_to_pt(100),
-                      mm_to_pt((210 - 100) / 2),
-                      mm_to_pt((297 - 100) / 2), DESC)
+        marker.render( cr, 100,
+                      (210 - 100) / 2,
+                      (297 - 100) / 2, DESC)
 
 surface.finish()
