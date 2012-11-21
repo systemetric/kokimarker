@@ -69,7 +69,7 @@ class Marker(object):
         # write on marker
         if show_text:
 
-            font_size = 6
+            font_size = 3
             grey = 0.5
 
             cr.select_font_face('Sans')
