@@ -9,8 +9,6 @@ class Marker(object):
 
     def __init__(self, code):
         self.code = code
-        self.desc = ""
-
         self.grid = coder.user_code_grid( self.code )
 
     def text_grid(self):
@@ -79,7 +77,7 @@ class Marker(object):
             cr.set_source_rgb(grey, grey, grey)
 
             cr.move_to(offset_x + cell_width + font_size, offset_y + cell_width + marker_width - font_size)
-            cr.show_text('libkoki marker #%d (%s)   %s' % (self.code, self.VERSION, self.desc))
+            cr.show_text('libkoki marker #%d (%s)   %s' % (self.code, self.VERSION, desc))
 
         # put dot in top left
         if corner_dot:
