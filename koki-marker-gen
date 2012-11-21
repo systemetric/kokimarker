@@ -1,59 +1,136 @@
 #!/usr/bin/env python
+"""
+libkoki marker generation script
+"""
 import cairo
-import getopt
 import kokimarker
-import sys
+import argparse
+from collections import namedtuple
+
+FILENAME_FMT = "{prefix}-{code}.pdf"
+
+PAPER_SIZES = {'A4': (210, 297),
+               'A3': (297, 420)}
+
+PaperDim = namedtuple('PaperDim', ['x', 'y'])
+
+class RenderError(Exception):
+    pass
+
+def get_args():
+    """Get command line arguments"""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--4up', dest='nup',
+                        action='store_const', const=4, default=1,
+                        help="places 4 markers on a single page if possible")
+    parser.add_argument('--desc', default="",
+                        help="a line of text to place on the marker")
+    parser.add_argument('--paper-size', default='A4', choices=PAPER_SIZES.keys(),
+                        help="the paper size to use")
+    parser.add_argument('--no-dot', action='store_true', default=False,
+                        help="don't show the top-left dot")
+    parser.add_argument('--no-text', action='store_true', default=False,
+                        help="don't show any text on the marker")
+    parser.add_argument('--no-outline', action='store_true', default=False,
+                        help="don't draw the outline")
+    parser.add_argument('--width', type=int, default=100,
+                        help="width (in mm) of marker to be produced")
+
+    parser.add_argument('code', type=int, help="the code to generate a marker for")
+    parser.add_argument('prefix', nargs='?', default='marker',
+                        help="the prefix to save the PDF under ($PREFIX-$CODE.pdf)")
+
+    return parser.parse_args()
+
 
 def mm_to_pt(x):
+    """Convert millimeters to points"""
     return x * 2.8346278
 
-if len(sys.argv) < 3:
-    print "Usage: ./markergen.py [--4up] [--desc val] <code> <output_prefix>"
-    sys.exit(1)
 
-optlist, args = getopt.getopt(sys.argv[1:], '', ['4up', 'desc='])
-
-if len(args) != 2:
-    print "Usage: ./markergen.py [--4up] [--desc val] <code> <output_prefix>"
-    sys.exit(1)
-
-CODE = int(args[0])
-OUTFNAME = "%s-%i.pdf" % (args[1], CODE)
-
-FOURUP = False
-DESC = ""
-
-# check for options
-for opt in optlist:
-
-    if opt[0] == "--4up":
-        FOURUP = True
-
-    elif opt[0] == "--desc":
-        DESC = opt[1]
-
-surface = cairo.PDFSurface(OUTFNAME, mm_to_pt(210), mm_to_pt(297) )
-cr = cairo.Context(surface)
-
-# Scale it up to mm-scale:
-cr.scale( mm_to_pt(1), mm_to_pt(1) )
-
-if not FOURUP:
-
-    marker = kokimarker.Marker( CODE )
-    
-    marker.render( cr, 100,
-                   (210 - 100) / 2,
-                   (297 - 100) / 2, DESC )
+def cairo_surface(filename, width, height):
+    """Create a configured Cairo surface"""
+    surface = cairo.PDFSurface(filename, width, height)
+    return surface
 
 
-else:
-    for x in [ (5,10), (105,10), (5,110), (105,110) ]:
+def cairo_context(surface):
+    """Configure a Cairo surface and produce a context"""
+    context = cairo.Context(surface)
+    context.scale(mm_to_pt(1), mm_to_pt(1))
+    return context
 
-        marker = kokimarker.Marker( CODE )
 
-        marker.render( cr, 100,
-                      (210 - 100) / 2,
-                      (297 - 100) / 2, DESC)
+_NUP_HANDLERS = {}
+def nup_handler(n):
+    """Decorator for nicely registering N-up handlers"""
+    def wrap(f):
+        """Register handler"""
+        _NUP_HANDLERS[n] = f
+    return wrap
 
-surface.finish()
+
+def main():
+    """Render marker(s)"""
+    options = get_args()
+    dims = PaperDim(*[mm_to_pt(x) for x in PAPER_SIZES[options.paper_size]])
+    page_width, page_height = PAPER_SIZES[options.paper_size]
+    filename = FILENAME_FMT.format(prefix=options.prefix,
+                                   code=options.code)
+
+    # prepare cairo
+    surface = cairo_surface(filename, *dims)
+    context = cairo_context(surface)
+
+    # create marker
+    marker = kokimarker.Marker(options.code)
+
+    # function to manage rendering
+    def _render(offset_x, offset_y):
+        """Inner function to render with the given options"""
+        marker.render(context, options.width, offset_x, offset_y,
+                      desc=options.desc, show_text=not options.no_text,
+                      corner_dot=not options.no_dot,
+                      outline=not options.no_outline)
+
+    try:
+        handler = _NUP_HANDLERS.get(options.nup, None)
+        handler(page_width, page_height, options.width, _render)
+    except RenderError as render_error:
+        print render_error
+        exit(1)
+
+    # write output
+    surface.finish()
+
+
+@nup_handler(1)
+def _1up(page_width, page_height, width, render_fn):
+    """1 marker in the middle"""
+
+    if width > page_width or width > page_height:
+        raise RenderError("Page not big enough")
+
+    render_fn((page_width - width) / 2,
+              (page_height - width) / 2)
+
+
+@nup_handler(4)
+def _4up(page_width, page_height, width, render_fn):
+    """4 markers in a 2x2 grid"""
+    padding = 0
+    p_2 = padding / 2.0
+    tl_offset_x = page_width / 2 - width - p_2
+    tl_offset_y = page_height / 2 - width - p_2
+
+    if width * 2 + padding > page_width or width * 2 + padding > page_height:
+        raise RenderError("Page not big enough")
+
+    render_fn(tl_offset_x, tl_offset_y)
+    render_fn(tl_offset_x + p_2 + width, tl_offset_y)
+    render_fn(tl_offset_x, tl_offset_y + p_2 + width)
+    render_fn(tl_offset_x + p_2 + width, tl_offset_y + p_2 + width)
+
+
+# render marker(s)
+main()
