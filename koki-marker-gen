@@ -35,10 +35,10 @@ def get_args():
                         help="don't draw the outline")
     parser.add_argument('--width', type=int, default=100,
                         help="width (in mm) of marker to be produced")
+    parser.add_argument('--prefix', default='marker',
+                        help="the prefix to save the PDF under ($PREFIX-$CODE.pdf)")
 
     parser.add_argument('code', type=int, help="the code to generate a marker for")
-    parser.add_argument('prefix', nargs='?', default='marker',
-                        help="the prefix to save the PDF under ($PREFIX-$CODE.pdf)")
 
     return parser.parse_args()
 
