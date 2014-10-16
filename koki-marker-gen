@@ -22,7 +22,8 @@ def get_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--4up', dest='nup',
                         action='store_const', const=4, default=1,
-                        help="places 4 markers on a single page if possible")
+                        help="places 4 markers on a single page if possible, "
+                        "going across then down")
     parser.add_argument('--desc', default="",
                         help="a line of text to place on the marker")
     parser.add_argument('--paper-size', default='A4', choices=PAPER_SIZES.keys(),
@@ -38,7 +39,14 @@ def get_args():
     parser.add_argument('--prefix', default='marker',
                         help="the prefix to save the PDF under ($PREFIX-$CODE.pdf)")
 
-    parser.add_argument('code', type=int, help="the code to generate a marker for")
+    parser.add_argument('code', type=int, nargs='+',
+                        help="""The code(s) to generate a marker for.
+    If only a single code is provided, then this will occupy all the available
+    places on the page. If more than one code is provided, then there must be
+    enough spaces on the page to place all the markers.
+
+    Practically, that means that only up to 4 markers can be specified at once,
+    though the user must specify --4up to enable this.""")
 
     return parser.parse_args()
 
@@ -76,27 +84,37 @@ def main():
     dims = PaperDim(*[mm_to_pt(x) for x in PAPER_SIZES[options.paper_size]])
     page_width, page_height = PAPER_SIZES[options.paper_size]
     filename = FILENAME_FMT.format(prefix=options.prefix,
-                                   code=options.code)
+                                   code='-'.join(map(str,options.code)))
 
     # prepare cairo
     surface = cairo_surface(filename, *dims)
     context = cairo_context(surface)
 
-    # create marker
-    marker = kokimarker.Marker(options.code)
-
     # function to manage rendering
-    def _render(offset_x, offset_y):
+    def _render(marker, offset_x, offset_y):
         """Inner function to render with the given options"""
         marker.render(context, options.width, offset_x, offset_y,
                       desc=options.desc, show_text=not options.no_text,
                       corner_dot=not options.no_dot,
                       outline=not options.no_outline)
 
+    handler = _NUP_HANDLERS.get(options.nup, None)
+    positions = list(handler(page_width, page_height, options.width))
+    codes = list(options.code)
+
+    if len(positions) < len(codes):
+        # it might be nice if we supported multi-page output at some point..
+        exit("Cannot fit {0} markers into {1} space(s)!".format(len(options.code), len(positions)))
+
+    # Maintain existing behaviour for single-code arguments
+    if len(codes) == 1 and len(positions) > 1:
+        codes = len(positions) * codes
+
+    # Render the markers
     try:
-        handler = _NUP_HANDLERS.get(options.nup, None)
-        for x, y in handler(page_width, page_height, options.width):
-            _render(x, y)
+        for code, (x, y) in zip(codes, positions):
+            marker = kokimarker.Marker(code)
+            _render(marker, x, y)
     except RenderError as render_error:
         print render_error
         exit(1)
