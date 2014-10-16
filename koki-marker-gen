@@ -95,7 +95,8 @@ def main():
 
     try:
         handler = _NUP_HANDLERS.get(options.nup, None)
-        handler(page_width, page_height, options.width, _render)
+        for x, y in handler(page_width, page_height, options.width):
+            _render(x, y)
     except RenderError as render_error:
         print render_error
         exit(1)
@@ -105,18 +106,18 @@ def main():
 
 
 @nup_handler(1)
-def _1up(page_width, page_height, width, render_fn):
+def _1up(page_width, page_height, width):
     """1 marker in the middle"""
 
     if width > page_width or width > page_height:
         raise RenderError("Page not big enough")
 
-    render_fn((page_width - width) / 2,
-              (page_height - width) / 2)
+    yield ((page_width - width) / 2,
+           (page_height - width) / 2)
 
 
 @nup_handler(4)
-def _4up(page_width, page_height, width, render_fn):
+def _4up(page_width, page_height, width):
     """4 markers in a 2x2 grid"""
     padding = 0
     p_2 = padding / 2.0
@@ -126,10 +127,10 @@ def _4up(page_width, page_height, width, render_fn):
     if width * 2 + padding > page_width or width * 2 + padding > page_height:
         raise RenderError("Page not big enough")
 
-    render_fn(tl_offset_x, tl_offset_y)
-    render_fn(tl_offset_x + p_2 + width, tl_offset_y)
-    render_fn(tl_offset_x, tl_offset_y + p_2 + width)
-    render_fn(tl_offset_x + p_2 + width, tl_offset_y + p_2 + width)
+    yield (tl_offset_x, tl_offset_y)
+    yield (tl_offset_x + p_2 + width, tl_offset_y)
+    yield (tl_offset_x, tl_offset_y + p_2 + width)
+    yield (tl_offset_x + p_2 + width, tl_offset_y + p_2 + width)
 
 
 # render marker(s)
