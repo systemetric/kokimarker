@@ -30,7 +30,7 @@ class Marker(object):
 
     def render( self, cr,
                 overall_width, offset_x, offset_y,
-                desc="", show_text=True,
+                desc="", show_text=True, font_size=3,
                 corner_dot = True,
                 outline = True ):
         """
@@ -45,6 +45,8 @@ class Marker(object):
         :param desc: A human-readable description of the marker to show.
         :param show_text: Whether or not to show information about the
                           the marker, including the description.
+        :param font_size: The size of font to use for the information and
+                          description.
         :param corner_dot: Whether or not to render a dot in the top left
                            corner of the marker.
         :param outline: Whether or not to draw an outline around the marker.
@@ -85,7 +87,6 @@ class Marker(object):
         # write on marker
         if show_text:
 
-            font_size = 3
             grey = 0.5
 
             cr.select_font_face('Sans')
