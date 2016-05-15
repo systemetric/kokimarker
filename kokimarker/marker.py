@@ -33,6 +33,22 @@ class Marker(object):
                 desc="", show_text=True,
                 corner_dot = True,
                 outline = True ):
+        """
+        Render the marker onto the given cairo context.
+
+        :param cr: A cairo context.
+        :param overall_width: The overall width to render the marker at.
+        :param offset_x: The x-offset within the context to render the
+                         marker at.
+        :param offset_y: The y-offset within the context to render the
+                         marker at.
+        :param desc: A human-readable description of the marker to show.
+        :param show_text: Whether or not to show information about the
+                          the marker, including the description.
+        :param corner_dot: Whether or not to render a dot in the top left
+                           corner of the marker.
+        :param outline: Whether or not to draw an outline around the marker.
+        """
 
         marker_width = overall_width * (10.0/12.0)
         cell_width = marker_width / 10
