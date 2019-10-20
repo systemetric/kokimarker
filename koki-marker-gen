@@ -2,9 +2,9 @@
 """
 libkoki marker generation script
 """
-import cairo
 import kokimarker
 import argparse
+import cairocffi as cairo
 from collections import namedtuple
 
 FILENAME_FMT = "{prefix}-{code}.pdf"

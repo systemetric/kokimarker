@@ -1,4 +1,4 @@
-import cairo
+import cairocffi as cairo
 import coder
 import mapper
 import math
