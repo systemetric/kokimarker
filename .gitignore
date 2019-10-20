@@ -2,3 +2,4 @@ MANIFEST
 dist
 build
 /test_markers
+*.pdf
