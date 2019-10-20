@@ -3,3 +3,4 @@ dist
 build
 /test_markers
 *.pdf
+*.pyc
